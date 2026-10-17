@@ -1,0 +1,10 @@
+parameters:
+    cover_directory: '%kernel.project_dir%/public/uploads/covers'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'

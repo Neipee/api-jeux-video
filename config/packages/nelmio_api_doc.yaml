@@ -1,0 +1,45 @@
+nelmio_api_doc:
+    documentation:
+        info:
+            title: API Jeux vidéo
+            description: API REST de jeux vidéo (TP Symfony). Se connecter avec POST /api/login_check puis cliquer sur Authorize et coller le token.
+            version: 1.0.0
+        paths:
+            /api/login_check:
+                post:
+                    tags: [Token]
+                    summary: Récupérer le token JWT
+                    requestBody:
+                        required: true
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        username:
+                                            type: string
+                                            example: admin@jeux.fr
+                                        password:
+                                            type: string
+                                            example: admin
+                    responses:
+                        '200':
+                            description: Token JWT
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token:
+                                                type: string
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []
+    areas:
+        path_patterns:
+            - ^/api(?!/doc)

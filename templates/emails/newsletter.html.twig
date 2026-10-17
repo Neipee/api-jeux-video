@@ -1,0 +1,15 @@
+<h1>Les jeux vidéo qui sortent cette semaine</h1>
+
+{% if videoGames|length > 0 %}
+    <ul>
+        {% for videoGame in videoGames %}
+            <li>
+                <strong>{{ videoGame.title }}</strong>
+                ({{ videoGame.category.name }}, {{ videoGame.editor.name }})
+                - sortie le {{ videoGame.releaseDate|date('d/m/Y') }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Aucun jeu ne sort dans les 7 prochains jours.</p>
+{% endif %}
