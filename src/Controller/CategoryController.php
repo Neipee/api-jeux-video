@@ -86,7 +86,7 @@ class CategoryController extends AbstractController
         );
     }
 
-    #[Route('/api/v1/categories/{id}', name: "updateCategory", requirements: ['id' => Requirement::DIGITS], methods: ['PUT'])]
+    #[Route('/api/v1/categories/{id}', name: "updateCategory", methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à modifier une catégorie')]
     public function updateCategory(
         Request $request, SerializerInterface $serializer, Category $currentCategory,
@@ -107,7 +107,7 @@ class CategoryController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $cachePool->invalidateTags(["categoriesCache", "videoGamesCache"]);
+        $cachePool->invalidateTags(["categoriesCache"]);
         $em->persist($updatedCategory);
         $em->flush();
 
@@ -119,7 +119,7 @@ class CategoryController extends AbstractController
         return $this->json(['status' => 'success'], Response::HTTP_OK, ["Location" => $location]);
     }
 
-    #[Route('/api/v1/categories/{id}', name: 'deleteCategory', requirements: ['id' => Requirement::DIGITS], methods: ['DELETE'])]
+    #[Route('/api/v1/categories/{id}', name: 'deleteCategory', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à supprimer une catégorie')]
     public function deleteCategory(Category $category, EntityManagerInterface $em,
                                    TagAwareCacheInterface $cachePool): JsonResponse
@@ -128,7 +128,7 @@ class CategoryController extends AbstractController
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
         }
 
-        $cachePool->invalidateTags(["categoriesCache", "videoGamesCache"]);
+        $cachePool->invalidateTags(["categoriesCache"]);
         $category->setDeletedAt(new \DateTime());
         $em->flush();
 

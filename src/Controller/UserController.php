@@ -22,7 +22,6 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 class UserController extends AbstractController
 {
     #[Route('/api/v1/users', name: 'users', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à voir les utilisateurs')]
     public function getUsers(UserRepository $userRepository, Request $request,
                              TagAwareCacheInterface $cachePool, SerializerInterface $serializer): JsonResponse
     {
@@ -46,7 +45,6 @@ class UserController extends AbstractController
         requirements: ['id' => Requirement::DIGITS],
         methods: ['GET']
     )]
-    #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à voir cet utilisateur')]
     public function getOneUser(User $user): JsonResponse {
         if ($user->getDeletedAt() !== null) {
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
@@ -90,7 +88,7 @@ class UserController extends AbstractController
         );
     }
 
-    #[Route('/api/v1/users/{id}', name: "updateUser", requirements: ['id' => Requirement::DIGITS], methods: ['PUT'])]
+    #[Route('/api/v1/users/{id}', name: "updateUser", methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à modifier un utilisateur')]
     public function updateUser(
         Request $request, SerializerInterface $serializer, User $currentUser,
@@ -129,7 +127,7 @@ class UserController extends AbstractController
         return $this->json(['status' => 'success'], Response::HTTP_OK, ["Location" => $location]);
     }
 
-    #[Route('/api/v1/users/{id}', name: 'deleteUser', requirements: ['id' => Requirement::DIGITS], methods: ['DELETE'])]
+    #[Route('/api/v1/users/{id}', name: 'deleteUser', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à supprimer un utilisateur')]
     public function deleteUser(User $user, EntityManagerInterface $em,
                                TagAwareCacheInterface $cachePool): JsonResponse

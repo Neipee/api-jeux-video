@@ -53,7 +53,6 @@ class SendNewsletterCommand extends Command
         foreach ($this->userRepository->findAll() as $user) {
             if ($user->isSubcriptionToNewsletter() && $user->getDeletedAt() === null) {
                 $this->mailerService->sendNewsletter($user->getEmail(), $nextVideoGames);
-                $io->writeln('E-mail envoyé à : ' . $user->getEmail());
                 $nbEmails++;
             }
         }

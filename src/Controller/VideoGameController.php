@@ -101,7 +101,7 @@ class VideoGameController extends AbstractController
         );
     }
 
-    #[Route('/api/v1/videogames/{id}', name: "updateVideoGame", requirements: ['id' => Requirement::DIGITS], methods: ['PUT'])]
+    #[Route('/api/v1/videogames/{id}', name: "updateVideoGame", methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à modifier un jeu vidéo')]
     public function updateVideoGame(
         Request $request, SerializerInterface $serializer, VideoGame $currentVideoGame,
@@ -145,7 +145,7 @@ class VideoGameController extends AbstractController
         return $this->json(['status' => 'success'], Response::HTTP_OK, ["Location" => $location]);
     }
 
-    #[Route('/api/v1/videogames/{id}', name: 'deleteVideoGame', requirements: ['id' => Requirement::DIGITS], methods: ['DELETE'])]
+    #[Route('/api/v1/videogames/{id}', name: 'deleteVideoGame', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à supprimer un jeu vidéo')]
     public function deleteVideoGame(VideoGame $videoGame, EntityManagerInterface $em,
                                     TagAwareCacheInterface $cachePool): JsonResponse
@@ -161,7 +161,7 @@ class VideoGameController extends AbstractController
         return $this->json(['status' => 'success'], Response::HTTP_OK);
     }
 
-    #[Route('/api/v1/videogames/{id}/cover', name: 'uploadCoverVideoGame', requirements: ['id' => Requirement::DIGITS], methods: ['POST'])]
+    #[Route('/api/v1/videogames/{id}/cover', name: 'uploadCoverVideoGame', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à modifier la jaquette d\'un jeu vidéo')]
     public function uploadCoverVideoGame(VideoGame $videoGame, Request $request, EntityManagerInterface $em,
                                          TagAwareCacheInterface $cachePool): JsonResponse
@@ -171,24 +171,17 @@ class VideoGameController extends AbstractController
         }
 
         $coverImage = $request->files->get('coverImage');
-        if (!$coverImage) {
-            return new JsonResponse(['error' => 'Aucune image envoyée (champ coverImage)'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $extension = $coverImage->guessExtension();
-        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
-            return new JsonResponse(['error' => 'Le fichier doit être une image (jpg, png, gif ou webp)'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $newFilename = uniqid().'.'.$extension;
-        try {
-            $coverImage->move(
-                $this->getParameter('cover_directory'),
-                $newFilename
-            );
-            $videoGame->setCoverImage($newFilename);
-        } catch (FileException $e) {
-            return new JsonResponse(['error' => 'Impossible d\'enregistrer l\'image'], 500);
+        if ($coverImage) {
+            $newFilename = uniqid().'.'.$coverImage->guessExtension();
+            try {
+                $coverImage->move(
+                    $this->getParameter('cover_directory'),
+                    $newFilename
+                );
+                $videoGame->setCoverImage($newFilename);
+            } catch (FileException $e) {
+                return new JsonResponse(['error' => 'Impossible d\'enregistrer l\'image'], 500);
+            }
         }
 
         $cachePool->invalidateTags(["videoGamesCache"]);

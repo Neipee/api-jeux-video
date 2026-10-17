@@ -86,7 +86,7 @@ class EditorController extends AbstractController
         );
     }
 
-    #[Route('/api/v1/editors/{id}', name: "updateEditor", requirements: ['id' => Requirement::DIGITS], methods: ['PUT'])]
+    #[Route('/api/v1/editors/{id}', name: "updateEditor", methods: ['PUT'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à modifier un éditeur')]
     public function updateEditor(
         Request $request, SerializerInterface $serializer, Editor $currentEditor,
@@ -107,7 +107,7 @@ class EditorController extends AbstractController
             return $this->json($errors, Response::HTTP_BAD_REQUEST);
         }
 
-        $cachePool->invalidateTags(["editorsCache", "videoGamesCache"]);
+        $cachePool->invalidateTags(["editorsCache"]);
         $em->persist($updatedEditor);
         $em->flush();
 
@@ -119,7 +119,7 @@ class EditorController extends AbstractController
         return $this->json(['status' => 'success'], Response::HTTP_OK, ["Location" => $location]);
     }
 
-    #[Route('/api/v1/editors/{id}', name: 'deleteEditor', requirements: ['id' => Requirement::DIGITS], methods: ['DELETE'])]
+    #[Route('/api/v1/editors/{id}', name: 'deleteEditor', methods: ['DELETE'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas autorisé à supprimer un éditeur')]
     public function deleteEditor(Editor $editor, EntityManagerInterface $em,
                                  TagAwareCacheInterface $cachePool): JsonResponse
@@ -128,7 +128,7 @@ class EditorController extends AbstractController
             return new JsonResponse(null, Response::HTTP_NOT_FOUND);
         }
 
-        $cachePool->invalidateTags(["editorsCache", "videoGamesCache"]);
+        $cachePool->invalidateTags(["editorsCache"]);
         $editor->setDeletedAt(new \DateTime());
         $em->flush();
 
